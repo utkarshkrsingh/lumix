@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Image Editor Software Architecture</title>
+	<style>
+		table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: #f0f0f0;
+			color: #333;
+			line-height: 1.6;
+		}
+
+		.container {
+			width: 90%;
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: white;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		}
+
+		h1 {
+			color: #003366;
+			text-align: center;
+			border-bottom: 2px solid #003366;
+			padding-bottom: 10px;
+		}
+
+		h2 {
+			color: #003366;
+			border-bottom: 1px solid #ccc;
+			padding-bottom: 5px;
+		}
+
+		h3 {
+			color: #006699;
+		}
+
+		.toc {
+			background-color: #f9f9f9;
+			border: 1px solid #ddd;
+			padding: 10px 20px;
+			margin: 20px 0;
+		}
+
+		.toc h2 {
+			margin-top: 0;
+		}
+
+		.toc ul {
+			list-style-type: none;
+			padding-left: 20px;
+		}
+
+		.toc a {
+			text-decoration: none;
+			color: #006699;
+		}
+
+		.toc a:hover {
+			text-decoration: underline;
+		}
+
+		.section {
+			margin-bottom: 30px;
+		}
+
+		ul,
+		ol {
+			padding-left: 25px;
+		}
+
+		.footer {
+			text-align: center;
+			margin-top: 30px;
+			padding-top: 20px;
+			border-top: 1px solid #ccc;
+			font-size: 0.9em;
+			color: #666;
+		}
+
+		.er-diagram {
+			text-align: center;
+			margin: 30px 0;
+			padding: 20px;
+			background-color: #f9f9f9;
+			border: 1px solid #ddd;
+		}
+
+		.er-diagram svg {
+			max-width: 100%;
+			height: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="container">
+
+        Photo Editor Software<br>
+        Software Architecture Document<br>
+        Version 1.0.0
+
+<h3 style="text-align: center; color: black;">Revision History</h3>
+<table>
+        <tr>
+            <th>Date</th>
+            <th>Version</th>
+            <th>Description</th>
+            <th>Author</th>
+        </tr>
+        <tr>
+            <td>2025-03-22</td>
+            <td>1.0.0</td>
+            <td>Initial version</td>
+            <td>Utkarsh Kumar Singh, Abdal Ahmad Khan, Prerna Singh, Siddharth Sharma</td>
+        </tr>
+
+    </table>
+		<h1>Lumix's (Image Editor) Architecture</h1>
+
+		<!-- Table of Contents -->
+		<div class="toc">
+			<h2>Table of Contents</h2>
+			<ul>
+				<li><a href="#introduction">1. Introduction</a>
+					<ul>
+						<li><a href="#purpose">1.1 Purpose</a></li>
+						<li><a href="#scope">1.2 Scope</a></li>
+						<li><a href="#definitions">1.3 Definitions, Acronyms and Abbreviations</a></li>
+						<li><a href="#references">1.4 References</a></li>
+					</ul>
+				</li>
+				<li><a href="#architectural-representations">2. Architectural Representations</a></li>
+				<li><a href="#architectural-goals">3. Architectural Goals and Constraints</a></li>
+				<li><a href="#use-case-view">4. Use-Case View</a>
+					<ul>
+						<li><a href="#significant-use-cases">4.1 Architectural Significant Use-cases</a></li>
+					</ul>
+				</li>
+				<li><a href="#logical-view">5. Logical View</a>
+					<ul>
+						<li><a href="#package-layering">5.1 Architecture Overview - Package and Subsystem Layering</a></li>
+					</ul>
+				</li>
+				<li><a href="#process-view">6. Process View</a></li>
+				<li><a href="#deployment-view">7. Deployment View</a>
+					<ul>
+						<li><a href="#external-pc">7.1 External Desktop PC</a></li>
+					</ul>
+				</li>
+				<li><a href="#size-performance">8. Size and Performance</a></li>
+				<li><a href="#quality">9. Quality</a></li>
+				<li><a href="#er-diagram">10. ER Diagram</a></li>
+			</ul>
+		</div>
+	</div>
+
+		<!-- Introduction Section -->
+		<div id="introduction" class="section">
+			<h2>1. Introduction</h2>
+
+			<h3>1.1 Purpose</h3>
+			<p>The purpose of this document is to define the software requirements for an Image Editor application
+				developed using Python and BeeWare. The application aims to provide users with an intuitive tool for
+				efficiently editing images, including features such as cropping, applying filters, adjusting colors, and
+				transforming images.</p>
+
+			<h3>1.2 Scope</h3>
+			<p>The Image Editor software will allow users to open, edit, and save images in various formats. It will
+				offer basic and advanced editing features such as brightness/contrast adjustments, resizing, and
+				applying artistic filters. Designed as a cross-platform application, it will run on both desktop and
+				mobile devices, ensuring a seamless user experience across different operating systems.</p>
+
+			<h3>1.3 Definitions, Acronyms and Abbreviations</h3>
+			<ul>
+				<li><strong>SRS</strong>: Software Requirements Specification</li>
+				<li><strong>GUI</strong>: Graphical User Interface</li>
+				<li><strong>API</strong>: Application Programming Interface</li>
+				<li><strong>SDK</strong>: Software Development Kit</li>
+				<li><strong>BeeWare</strong>: A Python framework for cross-platform applications</li>
+			</ul>
+
+			<h3>1.4 References</h3>
+			<ul>
+				<li>IEEE Std. 830-1998 - IEEE Recommended Practice for Software Requirements Specifications</li>
+				<li>BeeWare Official Documentation: <a href="https://beeware.org/">https://beeware.org/</a></li>
+				<li>Python Official Documentation: <a href="https://www.python.org/doc/">https://www.python.org/doc/</a>
+				</li>
+			</ul>
+		</div>
+
+		<!-- Architectural Representations Section -->
+		<div id="architectural-representations" class="section">
+			<h2>2. Architectural Representations</h2>
+			<p>The architecture of the Image Editor application follows a <strong>layered approach</strong>, ensuring
+				modularity, maintainability, and cross-platform compatibility.</p>
+		</div>
+
+		<!-- Architectural Goals and Constraints Section -->
+		<div id="architectural-goals" class="section">
+			<h2>3. Architectural Goals and Constraints</h2>
+
+			<h3>Goals</h3>
+			<ul>
+				<li>Provide an intuitive and efficient image editing tools</li>
+				<li>Ensure cross-platform compatibility (Windows, Linux)</li>
+				<li>Optimize real-time image processing performance</li>
+				<li>Maintain modular and maintainable code</li>
+			</ul>
+
+			<h3>Constraints</h3>
+			<ul>
+				<li>Must use Python and BeeWare</li>
+				<li>Performance must be optimized for real-time processing</li>
+				<li>The UI should be responsive and user-friendly</li>
+			</ul>
+		</div>
+
+		<!-- Use-Case View Section -->
+		<div id="use-case-view" class="section">
+			<h2>4. Use-Case View</h2>
+			<ul>
+				<li>Open an image from local storage</li>
+				<li>Apply filters such as grayscale, sepia, blur, and sharpen</li>
+				<li>Crop, resize, rotate, and flip images</li>
+				<li>Adjust brightness, contrast, and saturation</li>
+				<li>Add text and annotations to images</li>
+				<li>Save and export images in different formats (JPEG, PNG, BMP)</li>
+				<li>Undo and redo edits</li>
+			</ul>
+
+			<h3>4.1 Architectural Significant Use-cases</h3>
+			<p>[This section appears to be incomplete in the original document]</p>
+		</div>
+
+		<!-- Logical View Section -->
+		<div id="logical-view" class="section">
+			<h2>5. Logical View</h2>
+			<p>This section describes the structural organization of the system.</p>
+
+			<h3>Main Modules</h3>
+			<ul>
+				<li><strong>GUI Module</strong>: Provides an interactive user interface using BeeWare</li>
+				<li><strong>Image Processing Module</strong>: Handles various image manipulation tasks using Python
+					libraries like Pillow and NumPy</li>
+				<li><strong>File I/O Module</strong>: Manages reading and writing image files in multiple formats</li>
+				<li><strong>Undo/Redo Manager</strong>: Keeps track of changes and allows users to revert actions</li>
+			</ul>
+
+			<h3>5.1 Architecture overview - Package and Subsystem Layering</h3>
+			<p>[This section appears to be incomplete in the original document]</p>
+		</div>
+
+		<!-- Process View Section -->
+		<div id="process-view" class="section">
+			<h2>6. Process View</h2>
+			<p>Describes how different processes interact within the system.</p>
+
+			<h3>User Interaction Flow</h3>
+			<ol>
+				<li>The user loads an image using the GUI</li>
+				<li>The image is processed using the backend image processing module</li>
+				<li>The user applies modifications (filters, adjustments, transformations)</li>
+				<li>The changes are displayed in real-time</li>
+				<li>The user saves or exports the final image</li>
+			</ol>
+
+			<h3>Concurrency Considerations</h3>
+			<ol>
+				<li>The software should handle multiple image processing tasks efficiently without UI lag</li>
+				<li>Operations should be optimized for real-time responsiveness</li>
+			</ol>
+		</div>
+
+		<!-- Deployment View Section -->
+		<div id="deployment-view" class="section">
+			<h2>7. Deployment View</h2>
+			<p>Describes how the system will be deployed and run on different environments.</p>
+
+			<h3>Supported Platforms</h3>
+			<ul>
+				<li>Windows</li>
+				<li>Linux</li>
+			</ul>
+
+			<h3>Dependencies</h3>
+			<ul>
+				<li>Python 3.x</li>
+				<li>BeeWare Framework</li>
+				<li>Pillow and NumPy for image processing</li>
+			</ul>
+
+			<h3>7.1 External Desktop PC</h3>
+			<p>The <strong>External Desktop PC</strong> is the primary hardware for running the <strong>Image Editor
+					Application</strong>, handling <strong>image processing, editing, and storage</strong>. It provides
+				<strong>CPU & GPU power</strong> for rendering, supports <strong>file management</strong>, and enables
+				user interaction via <strong>GUI, keyboard, and mouse</strong>.
+			</p>
+
+			<h4>Key Roles:</h4>
+			<ul>
+				<li><strong>Processes images</strong> (applying filters, cropping, resizing)</li>
+				<li><strong>Loads & saves files</strong> to/from the local system</li>
+				<li><strong>Utilizes GPU acceleration</strong> for faster rendering</li>
+				<li><strong>Runs on Windows, Linux, and macOS</strong></li>
+			</ul>
+		</div>
+
+		<!-- Size and Performance Section -->
+		<div id="size-performance" class="section">
+			<h2>8. Size and Performance</h2>
+
+			<h3>Size Considerations</h3>
+			<ul>
+				<li>The Image Editor software is designed as a <strong>standalone</strong> application, meaning it will
+					not require extensive external dependencies, except for Python libraries like Pillow and NumPy</li>
+				<li>The expected file size will be <strong>moderate</strong>, influenced by:
+					<ul>
+						<li>The BeeWare framework, which supports cross-platform compatibility</li>
+						<li>The inclusion of various image processing functionalities</li>
+						<li>Support for different image formats (JPEG, PNG, BMP, etc.)</li>
+						<li>The graphical user interface (GUI) elements</li>
+					</ul>
+				</li>
+				<li>No persistent database is required, reducing the storage footprint compared to applications with
+					database storage</li>
+			</ul>
+
+			<h3>Performance Considerations</h3>
+			<h4>Speed Optimization:</h4>
+			<ul>
+				<li>Image loading time should be <strong>less than 2 seconds</strong></li>
+				<li>Applying filters should be completed <strong>within 500 milliseconds</strong></li>
+				<li>Real-time image processing is emphasized to ensure smooth user experience</li>
+			</ul>
+
+			<h4>Memory Usage:</h4>
+			<ul>
+				<li>Optimized for devices with <strong>low RAM</strong>, indicating memory-efficient algorithms are
+					implemented</li>
+				<li>Heavy computational tasks (e.g., applying filters) should not cause lag or crashes</li>
+			</ul>
+
+			<h4>System Constraints:</h4>
+			<ul>
+				<li>The application should run <strong>smoothly on Windows and Linux</strong></li>
+				<li>It should have an <strong>intuitive and responsive</strong> user interface</li>
+			</ul>
+
+			<h4>Reliability and Availability:</h4>
+			<ul>
+				<li>The software must handle errors gracefully to <strong>prevent crashes</strong></li>
+				<li>Expected uptime is <strong>99.9%</strong>, ensuring minimal downtime or performance issues</li>
+			</ul>
+		</div>
+
+		<!-- Quality Section -->
+		<div id="quality" class="section">
+			<h2>9. Quality</h2>
+			<p>The quality of the Image Editor software, as outlined in the SRS document, can be evaluated based on
+				several key software attributes:</p>
+
+			<h3>Reliability</h3>
+			<ol>
+				<li>The software is expected to handle errors gracefully and prevent crashes</li>
+				<li>Ensures smooth user experience by implementing error handling and stability mechanisms</li>
+			</ol>
+
+			<h3>Availability</h3>
+			<ol>
+				<li>Aims for 99.9% uptime, ensuring the application is accessible whenever required</li>
+				<li>Supports cross-platform functionality, making it widely available to users</li>
+			</ol>
+
+			<h3>Performance Efficiency</h3>
+			<ol>
+				<li>Optimized for real-time image processing</li>
+				<li>Fast response time, such as image loading within 2 seconds and filter application within 500ms</li>
+				<li>Low memory consumption, making it suitable for devices with limited RAM</li>
+			</ol>
+
+			<h3>Security</h3>
+			<ol>
+				<li>Prevents unauthorized access to user files</li>
+				<li>Likely follows secure coding practices to protect user data</li>
+			</ol>
+
+			<h3>Maintainability</h3>
+			<ol>
+				<li>Uses a modular architecture, allowing easy updates and feature expansions</li>
+				<li>Code is structured to facilitate debugging and enhancements</li>
+			</ol>
+
+			<h3>Portability</h3>
+			<ol>
+				<li>Designed to run on multiple operating systems (Windows, Linux)</li>
+				<li>Utilizes the BeeWare framework for cross-platform support</li>
+			</ol>
+
+			<h3>Usability</h3>
+			<ol>
+				<li>Provides an intuitive and responsive GUI</li>
+				<li>Supports essential features like drag-and-drop, undo/redo, and keyboard shortcuts</li>
+				<li>Caters to different user levels, including general users, graphic designers, and students</li>
+			</ol>
+
+			<h3>Scalability and Future Enhancements</h3>
+			<ol>
+				<li>Includes a roadmap for additional features like AI-based auto enhancement, batch processing, and
+					cloud storage integration</li>
+				<li>Designed to support plugins and additional file formats in future versions</li>
+			</ol>
+		</div>
+
+		<!-- ER Diagram Section -->
+		<div id="er-diagram" class="section">
+			<h2>10. ER Diagram</h2>
+			<p>The Entity Relationship Diagram below represents the data model for the Image Editor application. It
+				shows the key entities and their relationships in the system.</p>
+
+			<div class="er-diagram">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+					<!-- User Entity -->
+					<rect x="100" y="100" width="150" height="100" fill="#e6f3ff" stroke="#003366" stroke-width="2" />
+					<text x="175" y="130" text-anchor="middle" font-weight="bold">User</text>
+					<line x1="100" y1="140" x2="250" y2="140" stroke="#003366" stroke-width="1" />
+					<text x="110" y="160">- userID (PK)</text>
+					<text x="110" y="180">- preferences</text>
+
+					<!-- Image Entity -->
+					<rect x="450" y="100" width="150" height="140" fill="#e6f3ff" stroke="#003366" stroke-width="2" />
+					<text x="525" y="130" text-anchor="middle" font-weight="bold">Image</text>
+					<line x1="450" y1="140" x2="600" y2="140" stroke="#003366" stroke-width="1" />
+					<text x="460" y="160">- imageID (PK)</text>
+					<text x="460" y="180">- fileName</text>
+					<text x="460" y="200">- fileFormat</text>
+					<text x="460" y="220">- dimensions</text>
+
+					<!-- Project Entity -->
+					<rect x="275" y="300" width="150" height="140" fill="#e6f3ff" stroke="#003366" stroke-width="2" />
+					<text x="350" y="330" text-anchor="middle" font-weight="bold">Project</text>
+					<line x1="275" y1="340" x2="425" y2="340" stroke="#003366" stroke-width="1" />
+					<text x="285" y="360">- projectID (PK)</text>
+					<text x="285" y="380">- name</text>
+					<text x="285" y="400">- createdDate</text>
+					<text x="285" y="420">- lastModified</text>
+
+					<!-- Operation Entity -->
+					<rect x="600" y="300" width="150" height="160" fill="#e6f3ff" stroke="#003366" stroke-width="2" />
+					<text x="675" y="330" text-anchor="middle" font-weight="bold">Operation</text>
+					<line x1="600" y1="340" x2="750" y2="340" stroke="#003366" stroke-width="1" />
+					<text x="610" y="360">- operationID (PK)</text>
+					<text x="610" y="380">- type</text>
+					<text x="610" y="400">- parameters</text>
+					<text x="610" y="420">- timestamp</text>
+					<text x="610" y="440">- undoable</text>
+
+					<!-- Filter Entity -->
+					<rect x="50" y="450" width="150" height="120" fill="#e6f3ff" stroke="#003366" stroke-width="2" />
+					<text x="125" y="480" text-anchor="middle" font-weight="bold">Filter</text>
+					<line x1="50" y1="490" x2="200" y2="490" stroke="#003366" stroke-width="1" />
+					<text x="60" y="510">- filterID (PK)</text>
+					<text x="60" y="530">- name</text>
+					<text x="60" y="550">- parameters</text>
+
+					<!-- Relationships -->
+					<!-- User - Project -->
+					<line x1="175" y1="200" x2="325" y2="300" stroke="#006699" stroke-width="2" />
+					<polygon points="321,300 329,300 325,308" fill="#006699" />
+					<text x="225" y="235" text-anchor="middle" fill="#006699">Creates</text>
+					<text x="225" y="255" text-anchor="middle" fill="#006699">1:N</text>
+
+					<!-- Project - Image -->
+					<line x1="425" y1="350" x2="500" y2="240" stroke="#006699" stroke-width="2" />
+					<polygon points="496,244 504,244 500,236" fill="#006699" />
+					<text x="480" y="310" text-anchor="middle" fill="#006699">Contains</text>
+					<text x="480" y="330" text-anchor="middle" fill="#006699">1:N</text>
+
+					<!-- Image - Operation -->
+					<line x1="600" y1="180" x2="675" y2="300" stroke="#006699" stroke-width="2" />
+					<polygon points="671,296 679,296 675,304" fill="#006699" />
+					<text x="655" y="225" text-anchor="middle" fill="#006699">Has</text>
+					<text x="655" y="245" text-anchor="middle" fill="#006699">1:N</text>
+
+					<!-- Operation - Filter -->
+					<line x1="600" y1="380" x2="200" y2="510" stroke="#006699" stroke-width="2" />
+					<polygon points="204,507 204,513 196,510" fill="#006699" />
+					<text x="400" y="470" text-anchor="middle" fill="#006699">Uses</text>
+					<text x="400" y="490" text-anchor="middle" fill="#006699">N:1</text>
+				</svg>
+			</div>
+
+			<h3>Entity Descriptions</h3>
+
+			<h4>User</h4>
+			<p>Represents the users of the Image Editor application. Stores user-specific settings and preferences.</p>
+
+			<h4>Image</h4>
+			<p>Represents the digital images that users open, edit, and save. Contains properties like file name,
+				format, and dimensions.</p>
+
+			<h4>Project</h4>
+			<p>Represents an editing session where users can work on one or more images. Tracks creation and
+				modification dates.</p>
+
+			<h4>Operation</h4>
+			<p>Represents actions performed on images, such as applying filters, cropping, or resizing. Used by the
+				Undo/Redo Manager to track changes.</p>
+
+			<h4>Filter</h4>
+			<p>Represents the various filters that can be applied to images, including properties like name and
+				adjustable parameters.</p>
+
+			<h3>Relationship Descriptions</h3>
+
+			<ul>
+				<li><strong>User-Project (1:N)</strong>: A user can create and manage multiple projects, but each
+					project belongs to only one user.</li>
+				<li><strong>Project-Image (1:N)</strong>: A project can contain multiple images, but each image belongs
+					to a single project.</li>
+				<li><strong>Image-Operation (1:N)</strong>: An image can have multiple operations applied to it, and
+					each operation is specific to an image.</li>
+				<li><strong>Operation-Filter (N:1)</strong>: Multiple operations can use the same filter, but each
+					operation applies one specific filter at a time.</li>
+			</ul>
+		</div>
+
+		<div class="footer">
+			<p>Image Editor Software Architecture Document - 2025</p>
+		</div>
+	</div>
+</body>
+
+</html>
