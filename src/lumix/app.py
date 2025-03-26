@@ -1,6 +1,6 @@
 import toga
 from toga.style.pack import COLUMN, ROW, Pack
-from toga.colors import color
+from toga.colors import TRANSPARENT, color
 from travertino.constants import CENTER
 
 from lumix.custom_colors import *
@@ -78,15 +78,19 @@ class lumix(toga.App):
         ####################################################################################################
         
         ## MENU SECTION ####################################################################################
-        menu_label = toga.Label(
-                "MENU HERE",
+        self.file_menu = toga.Selection(
+                items = [
+                    "File",
+                    "Open Image"
+                    ],
+                on_change = self.file_selected,
                 style=Pack(
-                    flex=1,
-                    text_align=CENTER,
+                    margin=5,
+                    background_color=color(crust),
                     color=color(text)
                     )
                 )
-        menu_bar.add(menu_label)
+        menu_bar.add(self.file_menu)
         ####################################################################################################
 
         ## OPTION SECTION ##################################################################################
@@ -101,7 +105,7 @@ class lumix(toga.App):
         ####################################################################################################
 
         ## IMAGE PREVIEW ###################################################################################
-        image_preview_label = toga.Label(
+        self.image_preview_label = toga.Label(
                 "IMAGE PREVIEW",
                 style=Pack(
                     flex=1,
@@ -109,7 +113,13 @@ class lumix(toga.App):
                     color=color(text)
                     )
                 )
-        image_preview_box.add(image_preview_label)
+        image_preview_box.add(self.image_preview_label)
+        # my_image = toga.Image("/home/utkarshkrsingh/Downloads/itachi.jpg")
+        # image_preview = toga.ImageView(
+        #         my_image,
+        #         flex=1
+        #         )
+        # image_preview_box.add(image_preview)
         ####################################################################################################
 
         ## CONTROL PANEL ###################################################################################
@@ -127,6 +137,10 @@ class lumix(toga.App):
         self.main_window = toga.Window(title=self.formal_name)
         self.main_window.content = main_box
         self.main_window.show()
+
+    def file_selected(self, widget):
+        self.image_preview_label.text = f"Selected: {widget.value}"
+
 
 def main():
     return lumix("Lumix", icon="./resources/lumix.png")
