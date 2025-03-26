@@ -1,6 +1,5 @@
 import toga
 from toga.style.pack import COLUMN, ROW, Pack
-from toga.colors import TRANSPARENT, color
 from travertino.constants import CENTER
 
 from lumix.custom_colors import *
@@ -12,16 +11,17 @@ class lumix(toga.App):
         main_box = toga.Box(
                 style=Pack(
                     direction=COLUMN,
+                    background_color=crust
                     )
                 )
 
         ## Creating Menu Bar 
         menu_bar = toga.Box(
                 style=Pack(
-                    direction=ROW,
+                    direction=COLUMN,
                     flex=1,
-                    background_color=color(crust),
-                    vertical_align_items=CENTER
+                    background_color=crust,
+                    horizontal_align_items=CENTER,
                     )
                 )
         main_box.add(menu_bar)
@@ -40,7 +40,7 @@ class lumix(toga.App):
                 style=Pack(
                     direction=ROW,
                     flex = 1,
-                    background_color=color(mantle),
+                    background_color=mantle,
                     vertical_align_items=CENTER,
                     horizontal_align_content=CENTER
                     )
@@ -78,19 +78,16 @@ class lumix(toga.App):
         ####################################################################################################
         
         ## MENU SECTION ####################################################################################
-        self.file_menu = toga.Selection(
-                items = [
-                    "File",
-                    "Open Image"
-                    ],
-                on_change = self.file_selected,
+        self.open_button = toga.Button(
+                "Open File",
+                on_press = self.open_file,
                 style=Pack(
-                    margin=5,
-                    background_color=color(crust),
-                    color=color(text)
+                    background_color=surface,
+                    flex=1,
+                    color=text
                     )
                 )
-        menu_bar.add(self.file_menu)
+        menu_bar.add(self.open_button)
         ####################################################################################################
 
         ## OPTION SECTION ##################################################################################
@@ -98,28 +95,21 @@ class lumix(toga.App):
                 "O\nP\nT\nI\nO\nN\n\nH\nE\nR\nE\n",
                 style=Pack(
                     text_align=CENTER,
-                    color=color(text),
+                    color=text,
                     )
                 )
         option_box.add(option_label)
         ####################################################################################################
 
         ## IMAGE PREVIEW ###################################################################################
-        self.image_preview_label = toga.Label(
-                "IMAGE PREVIEW",
+        my_Image = toga.Image("./resources/lumix.png")
+        self.image_preview = toga.ImageView(
+                my_Image,
                 style=Pack(
-                    flex=1,
-                    text_align=CENTER,
-                    color=color(text)
+                    flex=1
                     )
                 )
-        image_preview_box.add(self.image_preview_label)
-        # my_image = toga.Image("/home/utkarshkrsingh/Downloads/itachi.jpg")
-        # image_preview = toga.ImageView(
-        #         my_image,
-        #         flex=1
-        #         )
-        # image_preview_box.add(image_preview)
+        image_preview_box.add(self.image_preview)
         ####################################################################################################
 
         ## CONTROL PANEL ###################################################################################
@@ -128,7 +118,7 @@ class lumix(toga.App):
                 style=Pack(
                     flex=1,
                     text_align=CENTER,
-                    color=color(text)
+                    color=text
                     )
                 )
         control_box.add(control_label)
@@ -138,8 +128,14 @@ class lumix(toga.App):
         self.main_window.content = main_box
         self.main_window.show()
 
-    def file_selected(self, widget):
-        self.image_preview_label.text = f"Selected: {widget.value}"
+    async def open_file(self, widget):
+        file_path = await self.main_window.open_file_dialog(
+                title="Select Image File"
+                )
+        if file_path:
+            print(file_path)
+            my_image = toga.Image(file_path)
+            self.image_preview.image = my_image
 
 
 def main():
