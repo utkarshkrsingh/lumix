@@ -1,16 +1,16 @@
 # This project was generated with 0.3.22 using template: https://github.com/beeware/briefcase-template@v0.3.22
 [tool.briefcase]
 project_name = "lumix"
-bundle = "dev.is-a.utkarsh"
+bundle = "com.is-a"
 version = "0.0.1"
-url = "https://github.com/utkarshkrsingh/lumix"
+url = "https://utkarsh.is-a.dev/blog/lumix/"
 license.file = "LICENSE"
 author = "Utkarsh, Siddharth, Prerna, Abdal"
 author_email = "utkarsh.isa.dev@gmail.com"
 
 [tool.briefcase.app.lumix]
-formal_name = "lumix"
-description = "Image Editor using Python and Beeware"
+formal_name = "Lumix"
+description = "An image editor using Beeware."
 long_description = """More details about the app should go here.
 """
 sources = [
@@ -21,6 +21,8 @@ test_sources = [
 ]
 
 requires = [
+	"toga",
+	"Pillow"
 ]
 test_requires = [
     "pytest",
